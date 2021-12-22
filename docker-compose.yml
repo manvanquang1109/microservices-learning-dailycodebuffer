@@ -1,0 +1,44 @@
+version: "1.0"
+services:
+  service-registry:
+    image: service-registry
+    ports:
+      - "8761:8761"
+
+#  cloud-config-server:
+#    image: cloud-config-server
+#    environment:
+#      - JAVA_OPTS=
+#        -DEUREKA_SERVER=http://service-registry:8761/eureka
+#    links:
+#      - service-registry
+#    ports:
+#      - "9296:9296"
+#    depends_on:
+#      - service-registry
+#    networks:
+#      - test-network
+
+  department-service:
+    image: department-service
+    ports:
+      - "9001:9001"
+    links:
+      - service-registry
+    depends_on:
+      - service-registry
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://service-registry:8761/eureka/
+
+  user-service:
+    image: user-service
+    ports:
+      - "9002:9002"
+    links:
+      - service-registry
+    depends_on:
+      - service-registry
+      - department-service
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://service-registry:8761/eureka/
+
